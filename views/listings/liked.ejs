@@ -1,0 +1,63 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .custom-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-img-top {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .custom-card:hover .card-img-top {
+    transform: scale(1.03);
+  }
+
+  .card-body {
+    flex-grow: 1;
+    padding: 1rem;
+    background-color: white;
+  }
+
+  .card-footer {
+    border-top: none;
+    background-color: white;
+    padding-bottom: 1rem;
+  }
+</style>
+
+<div class="container mt-4">
+  <h3>Your Favourite Listings</h3>
+
+  <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 g-4">
+    <% for(let listing of likedListings) {%>
+      <div class="col">
+        <div class="card custom-card shadow-sm">
+          <img src="<%= listing.images %>" class="card-img-top" alt="Listing Image">
+          <div class="card-body">
+            <p class="mb-2">
+              <b><%= listing.title %></b><br>
+              ₹<%= listing.price.toLocaleString("en-IN") %>/night
+            </p>
+          </div>
+          <div class="card-footer text-center">
+            <a href="/listings/<%= listing._id %>" class="btn btn-outline-primary">View</a>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>

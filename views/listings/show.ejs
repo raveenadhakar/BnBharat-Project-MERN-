@@ -1,0 +1,601 @@
+<% layout("/layouts/boilerplate") %>
+  <div class="row mt-3">
+    <div class="col-8 offset-2">
+
+      <h3 class="fun-title">
+        <%= listing.title %>
+      </h3>
+
+      <div class="card row mb-4">
+
+        <div class="photo-gallery-container position-relative">
+          <% if (listing.images && listing.images.length> 0) { %>
+            <div class="row g-0 h-100">
+              <!-- Main image (left side - 60% width) -->
+              <div class="col-12 col-md-8">
+                <div class="main-image-container">
+                  <img src="<%= listing.images[0].url %>" class="main-image" alt="<%= listing.title %>"
+                    onclick="openPhotoModal(0)">
+                </div>
+              </div>
+
+              <!-- Grid of smaller images (right side - 40% width) -->
+              <div class="col-12 col-md-4">
+                <div class="small-images-grid">
+                  <!-- Top row -->
+                  <div class="row g-0 small-image-row">
+                    <% if (listing.images[1]) { %>
+                      <div class="col-6 small-image-col">
+                        <div class="small-image-container">
+                          <img src="<%= listing.images[1].url %>" class="small-image" alt="<%= listing.title %>"
+                            onclick="openPhotoModal(1)">
+                        </div>
+                      </div>
+                      <% } %>
+                        <% if (listing.images[2]) { %>
+                          <div class="col-6 small-image-col">
+                            <div class="small-image-container">
+                              <img src="<%= listing.images[2].url %>" class="small-image top-right-image"
+                                alt="<%= listing.title %>" onclick="openPhotoModal(2)">
+                            </div>
+                          </div>
+                          <% } %>
+                  </div>
+
+                  <!-- Bottom row -->
+                  <div class="row g-0 small-image-row">
+                    <% if (listing.images[3]) { %>
+                      <div class="col-6 small-image-col">
+                        <div class="small-image-container">
+                          <img src="<%= listing.images[3].url %>" class="small-image bottom-left-image"
+                            alt="<%= listing.title %>" onclick="openPhotoModal(3)">
+                        </div>
+                      </div>
+                      <% } %>
+                        <% if (listing.images[4]) { %>
+                          <div class="col-6 small-image-col">
+                            <div class="small-image-container position-relative">
+                              <img src="<%= listing.images[4].url %>" class="small-image bottom-right-image"
+                                alt="<%= listing.title %>" onclick="openPhotoModal(4)">
+                              <!-- Show overlay if there are more photos -->
+                              <% if (listing.images.length> 5) { %>
+                                <div class="photo-overlay" onclick="openPhotoModal(4)">
+                                  <span class="text-white fw-bold">
+                                    <i class="fas fa-images me-2"></i>+<%= listing.images.length - 5 %> more
+                                  </span>
+                                </div>
+                                <% } %>
+                            </div>
+                          </div>
+                          <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Show All Photos Button -->
+            <button class="btn btn-outline-dark show-all-photos-btn" onclick="openPhotoModal(0)">
+              <i class="fas fa-th me-2"></i>Show all <%= listing.images.length %> photos
+            </button>
+            <% } else { %>
+              <!-- No images placeholder -->
+              <div class="no-images-placeholder text-center py-5">
+                <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No photos available</h5>
+              </div>
+              <% } %>
+        </div>
+
+        <!-- Custom Photo Modal -->
+        <div id="photoModal" class="photo-modal">
+          <div class="photo-modal-content">
+            <!-- Modal Header -->
+            <div class="photo-modal-header">
+              <button class="close-btn" onclick="closePhotoModal()">
+                <i class="fas fa-times"></i>
+              </button>
+              <div class="photo-counter">
+                <span id="currentPhotoIndex">1</span> / <%= listing.images.length %>
+              </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="photo-modal-body">
+              <!-- Navigation Arrows -->
+              <button class="nav-arrow nav-arrow-left" onclick="previousPhoto()">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+
+              <!-- Main Photo Display -->
+              <div class="photo-display">
+                <img id="modalPhoto" src="" alt="<%= listing.title %>">
+                <div id="photoCaption" class="photo-caption"></div>
+              </div>
+
+              <button class="nav-arrow nav-arrow-right" onclick="nextPhoto()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <div class="card-body">
+          <h5 class="listing-bottom-title"><b>Entire <%= listing.propertyType %> in <%= listing.location%>, <%=
+                    listing.country%></b></h5>
+          <ul class="list-inline  ps-0 mb-0 custom-list ">
+            <li class="list-inline-item">
+              <%= listing.guests %> guests
+            </li>
+            <li class="list-inline-item">
+              <%= listing.bedrooms %> bedrooms
+            </li>
+            <li class="list-inline-item">
+              <%= listing.beds %> beds
+            </li>
+            <li class="list-inline-item">
+              <%= listing.bathrooms %> bathrooms
+            </li>
+          </ul>
+
+          <!-- Price Section with Discount -->
+          <div class="price-section mt-3 p-3 border rounded">
+            <% if (listing.discount && listing.discount> 0) { %>
+              <% const discountedPrice=listing.price - (listing.price * listing.discount / 100); %>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="text-decoration-line-through text-muted fs-5">₹<%= listing.price.toLocaleString("en-IN")
+                      %></span>
+                  <span class="fw-bold text-success fs-4">₹<%= Math.round(discountedPrice).toLocaleString("en-IN") %>
+                  </span>
+                  <span class="text-muted">per night</span>
+                  <span class="badge bg-danger fs-6">
+                    <%= listing.discount %>% OFF
+                  </span>
+                </div>
+                <small class="text-success">You save ₹<%= Math.round(listing.price * listing.discount /
+                    100).toLocaleString("en-IN") %> per night!</small>
+                <% } else { %>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold fs-4">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                    <span class="text-muted">per night</span>
+                  </div>
+                  <% } %>
+          </div>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <h3>What this place offers</h3>
+      <br>
+      <% const amenityIcons={ "WiFi" : "fa-solid fa-wifi" , "AC" : "fa-regular fa-snowflake" , "Geyser"
+        : "fa-solid fa-bath" , "Heater" : "fa-solid fa-fire" , "Fireplace" : "fa-solid fa-fire" , "Mountain View"
+        : "fa-solid fa-mountain" , "Pool" : "fa-solid fa-water-ladder" , "Parking" : "fa-solid fa-square-parking" , "TV"
+        : "fa-solid fa-tv" , "Work Desk" : "fa-solid fa-desktop" , "Balcony" : "fa-solid fa-building" , "Fan"
+        : "fa-solid fa-fan" , "Solar Power" : "fa-solid fa-solar-panel" , "Courtyard" : "fa-solid fa-tree"
+        , "Compost Toilet" : "fa-solid fa-toilet" , "Eco-Friendly" : "fa-solid fa-leaf" , "Kitchenette"
+        : "fa-solid fa-utensils" , "Food" : "fa-solid fa-utensils" , "Trekking Nearby" : "fa-solid fa-person-hiking"
+        , "Local Cuisine" : "fa-solid fa-utensils" , "Forest View" : "fa-solid fa-tree" , "Private Beach"
+        : "fa-solid fa-umbrella-beach" }; %>
+        <ul>
+          <% listing.amenities.forEach(amenity=> { %>
+            <li class="d-flex align-items-center list-unstyled">
+              <i class="<%= amenityIcons[amenity] || 'fa-solid fa-circle-check' %> me-2 text-dark"></i>
+              &nbsp;&nbsp;&nbsp;<%= amenity %></br>
+            </li>
+            <% }) %>
+        </ul>
+
+        <hr>
+        <h3>What rules to be followed</h3>
+        <br>
+        <ul>
+          <% for (let i=0; i < listing.rules.length; i++) { %>
+            <li>
+              <%= listing.rules[i] %>
+            </li>
+              <% } %>
+        </ul>
+
+        <% if(currentUser && currentUser._id.equals(listing.owner._id)) { %>
+          <hr>
+          <br>
+          <div class=" row g-2 mt-3 mb-5 justify-content-between">
+            <div class="col-12 col-md-5">
+              <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark w-50">Edit</a>
+            </div>
+
+            <div class="col-12 col-md-5 ms-md-auto ">
+              <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                <button class="btn btn-dark w-50">Delete</button>
+              </form>
+            </div>
+          </div>
+          <% } %>
+
+            <% if(currentUser) { %>
+              <hr>
+              <div class="mb-3">
+                <h3>Leave a review</h3>
+                <form method="POST" action="/listings/<%= listing._id %>/reviews" novalidate class="needs-validation">
+                  <div class="mb-3 mt-3">
+                    <label for="rating" class="form-label">Rating</label>
+                    <fieldset class="starability-slot">
+                      <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked
+                        aria-label="No rating." />
+                      <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                      <label for="first-rate1" title="Terrible">1 star</label>
+                      <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                      <label for="first-rate2" title="Not good">2 stars</label>
+                      <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                      <label for="first-rate3" title="Average">3 stars</label>
+                      <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                      <label for="first-rate4" title="Very good">4 stars</label>
+                      <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                      <label for="first-rate5" title="Amazing">5 stars</label>
+                    </fieldset>
+                  </div>
+                  <div class="mb-3 mt-3">
+                    <label for="comment" class="form-label">comment</label>
+                    <textarea id="comment" name="review[comment]" rows="5" cols="30" class="form-control"
+                      required></textarea>
+                    <div class="invalid-feedback">Please add a comment</div>
+                  </div><br>
+                  <button class="btn btn-dark">Submit</button>
+                </form>
+              </div>
+              <% } %>
+
+
+                <hr>
+                <div class="mb-4">
+                  <h3 class="fw-bold fs-4">
+                    ⭐ <%= avgRating %>/5.00 &nbsp;&nbsp;&nbsp;· <%= totalReviews %> reviews
+                  </h3>
+                </div>
+                <br>
+
+
+
+                <!-- Overall rating distribution -->
+                <h6 class="mb-3">Overall rating distribution</h6>
+                <% Object.keys(ratingPercentages).sort((a,b)=>b-a).forEach(function(star) {
+                  var percentage = ratingPercentages[star];
+                  %>
+                  <div class="mb-2 col-6 col-md-6 col-sm-12 col-xs-12">
+                    <div class="d-flex justify-content-between">
+                      <span>
+                        <%= star %> star
+                      </span>
+                      <span>
+                        <%= percentage %>%
+                      </span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: <%= percentage %>%;"
+                        aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+
+
+
+
+
+                    <% if(listing.reviews.length> 0) { %>
+                      <hr>
+
+                      <h4>All Reviews</h4>
+                      <div class="row">
+                        <% listing.reviews.forEach(review=> { %>
+                          <div class="col-12 col-md-6 mb-3">
+                            <div class="card shadow-sm p-3">
+                              <div class="d-flex align-items-center mb-2">
+                                <i class="fa-solid fa-user-circle fa-2x me-2"></i>
+                                <h5 class="review-author">
+                                  <%= review.author.username%>
+                                </h5>
+                              </div>
+                              <div>⭐ <%= review.rating %> / 5</div>
+                              <p class="mb-0">
+                                <%= review.comment %>
+                              </p><br>
+                              <form class="mb-3" method="POST"
+                                action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
+                                <button class="btn btn-sm btn-dark">Delete</button>
+                              </form>
+                            </div>
+                          </div>
+                          <% }) %>
+                      </div>
+                      <% } %>
+                        <hr>
+                        <h3 class=" mt-4 mb-3">Meet your Host</h3>
+
+                        <div class="d-flex align-items-center gap-3 p-3 border rounded shadow-sm">
+                          <% if (listing.owner && listing.owner.profilePic) { %>
+                            <img src="<%= listing.owner.profilePic %>" alt="Profile Picture" class="rounded-circle"
+                              width="60" height="60">
+                            <% } else if (listing.owner) { %>
+                              <div
+                                class="rounded-circle bg-dark text-white d-flex justify-content-center align-items-center"
+                                style="width: 60px; height: 60px; font-size: 1.5rem;">
+                                <%= listing.owner.username.charAt(0).toUpperCase() %>
+                              </div>
+                              <% } %>
+
+                                <div>
+                                  <h5 class="mb-0">Hosted by <%= listing.owner ? listing.owner.username : 'Unknown' %>
+                                  </h5>
+
+                                </div>
+                        </div>
+                        <hr>
+                        <div class="map-container mt-4 mb-5 ">
+                          <h3>Where you'll be</h3>
+                          <div id="map"></div>
+                        </div>
+    </div>
+  </div>
+
+  <script>
+    // Photo gallery data
+    const photos = [
+      <% if (listing.images && listing.images.length > 0) { %>
+        <% for (let i = 0; i < listing.images.length; i++) { %>
+      {
+        url: '<%= listing.images[i].url %>',
+        caption: '<%= listing.title %> - Photo <%= i + 1 %>'
+      } <% if (i < listing.images.length - 1) { %>,<% } %>
+        <% } %>
+      <% } %>
+    ];
+    let currentPhotoIndex = 0;
+
+    // Open photo modal
+    function openPhotoModal(index) {
+      console.log('Opening photo modal with index:', index); // Debug log
+
+      // Check if photos array exists and has images
+      if (!photos || photos.length === 0) {
+        console.log('No photos available');
+        return;
+      }
+
+      currentPhotoIndex = index;
+      const modal = document.getElementById('photoModal');
+      const modalPhoto = document.getElementById('modalPhoto');
+      const photoCounter = document.getElementById('currentPhotoIndex');
+      const photoCaption = document.getElementById('photoCaption');
+
+      if (!modal || !modalPhoto || !photoCounter || !photoCaption) {
+        console.error('Modal elements not found');
+        return;
+      }
+
+      modalPhoto.src = photos[currentPhotoIndex].url;
+      photoCounter.textContent = currentPhotoIndex + 1;
+      photoCaption.textContent = photos[currentPhotoIndex].caption;
+
+      modal.style.display = 'flex';
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+
+      // Update navigation arrows
+      updateNavigationArrows();
+    }
+
+    // Close photo modal
+    function closePhotoModal() {
+      const modal = document.getElementById('photoModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Navigate to previous photo
+    function previousPhoto() {
+      if (currentPhotoIndex > 0) {
+        currentPhotoIndex--;
+        updatePhoto();
+      }
+    }
+
+    // Navigate to next photo
+    function nextPhoto() {
+      if (currentPhotoIndex < photos.length - 1) {
+        currentPhotoIndex++;
+        updatePhoto();
+      }
+    }
+
+    // Update photo display
+    function updatePhoto() {
+      const modalPhoto = document.getElementById('modalPhoto');
+      const photoCounter = document.getElementById('currentPhotoIndex');
+      const photoCaption = document.getElementById('photoCaption');
+
+      if (modalPhoto && photoCounter && photoCaption) {
+        modalPhoto.src = photos[currentPhotoIndex].url;
+        photoCounter.textContent = currentPhotoIndex + 1;
+        photoCaption.textContent = photos[currentPhotoIndex].caption;
+
+        updateNavigationArrows();
+      }
+    }
+
+    // Update navigation arrow states
+    function updateNavigationArrows() {
+      const leftArrow = document.querySelector('.nav-arrow-left');
+      const rightArrow = document.querySelector('.nav-arrow-right');
+
+      if (leftArrow && rightArrow) {
+        leftArrow.disabled = currentPhotoIndex === 0;
+        rightArrow.disabled = currentPhotoIndex === photos.length - 1;
+      }
+    }
+
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log('DOM loaded, photos array:', photos); // Debug log
+
+      // Keyboard navigation
+      document.addEventListener('keydown', function (e) {
+        const modal = document.getElementById('photoModal');
+        if (modal && modal.classList.contains('show')) {
+          if (e.key === 'Escape') {
+            closePhotoModal();
+          } else if (e.key === 'ArrowLeft') {
+            previousPhoto();
+          } else if (e.key === 'ArrowRight') {
+            nextPhoto();
+          }
+        }
+      });
+
+      // Close modal when clicking outside the image
+      const modal = document.getElementById('photoModal');
+      if (modal) {
+        modal.addEventListener('click', function (e) {
+          if (e.target === this) {
+            closePhotoModal();
+          }
+        });
+      }
+    });
+  </script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js">
+  </script>
+  <script>
+    let mapToken = "<%= process.env.MAP_TOKEN %>";
+    let listing = <% - JSON.stringify(listing) %>;
+    mapboxgl.accessToken = mapToken;
+    const map = new mapboxgl.Map({
+      container: 'map', // container ID
+      center: listing.geometry.coordinates, // starting position [lng, lat]. Note that lat must be set between -90 and 90
+      zoom: 9 // starting zoom
+    });
+    const size = 200;
+
+    // This implements `StyleImageInterface`
+    // to draw a pulsing dot icon on the map.
+    const pulsingDot = {
+      width: size,
+      height: size,
+      data: new Uint8Array(size * size * 4),
+
+      // When the layer is added to the map,
+      // get the rendering context for the map canvas.
+      onAdd: function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        this.context = canvas.getContext('2d');
+      },
+
+      // Call once before every frame where the icon will be used.
+      render: function () {
+        const duration = 1000;
+        const t = (performance.now() % duration) / duration;
+
+        const radius = (size / 2) * 0.3;
+        const outerRadius = (size / 2) * 0.7 * t + radius;
+        const context = this.context;
+
+        // Draw the outer circle.
+        context.clearRect(0, 0, this.width, this.height);
+        context.beginPath();
+        context.arc(
+          this.width / 2,
+          this.height / 2,
+          outerRadius,
+          0,
+          Math.PI * 2
+        );
+        context.fillStyle = `rgba(255, 200, 200, ${1 - t})`;
+        context.fill();
+
+        // Draw the inner circle.
+        context.beginPath();
+        context.arc(
+          this.width / 2,
+          this.height / 2,
+          radius,
+          0,
+          Math.PI * 2
+        );
+        context.fillStyle = 'rgba(255, 100, 100, 1)';
+        context.strokeStyle = 'white';
+        context.lineWidth = 2 + 4 * (1 - t);
+        context.fill();
+        context.stroke();
+
+        // Update this image's data with data from the canvas.
+        this.data = context.getImageData(
+          0,
+          0,
+          this.width,
+          this.height
+        ).data;
+
+        // Continuously repaint the map, resulting
+        // in the smooth animation of the dot.
+        map.triggerRepaint();
+
+        // Return `true` to let the map know that the image was updated.
+        return true;
+      }
+    };
+
+    map.on('load', () => {
+      map.addImage('pulsing-dot', pulsingDot, { pixelRatio: 2 });
+
+      map.addSource('dot-point', {
+        'type': 'geojson',
+        'data': {
+          'type': 'FeatureCollection',
+          'features': [
+            {
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': listing.geometry.coordinates // icon position [lng, lat]
+              },
+              'properties': {
+                'description': `
+                            <h6>${listing.title}</h6>
+                            <p> 📍${listing.location}</p>
+                            <a href="/listings/<%= listing._id %>" style="color:#e61e4d; text-decoration:none; font-weight:bold;">View Details →</a>`
+
+              }
+            }
+          ]
+        }
+      });
+      map.addLayer({
+        'id': 'layer-with-pulsing-dot',
+        'type': 'symbol',
+        'source': 'dot-point',
+        'layout': {
+          'icon-image': 'pulsing-dot'
+        }
+      });
+      // Add popup when clicked
+      map.on('click', 'layer-with-pulsing-dot', (e) => {
+        new mapboxgl.Popup()
+          .setLngLat(e.features[0].geometry.coordinates)
+          .setHTML(e.features[0].properties.description)
+          .addTo(map);
+      });
+
+      // Change cursor on hover
+      map.on('mouseenter', 'layer-with-pulsing-dot', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'layer-with-pulsing-dot', () => {
+        map.getCanvas().style.cursor = '';
+      });
+    });
+  </script>

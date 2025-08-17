@@ -1,0 +1,147 @@
+<% layout("/layouts/boilerplate") %>    
+<div class="row mt-3">
+  <div class="col-8 offset-2 ">
+    <h3 class="fun-title">
+      <i class="fa-solid fa-house-medical"></i>
+      &nbsp;Tell us about your place
+    </h3>
+    <form method="POST" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
+
+      <div class="mb-3">
+        <label class="form-label"><b>Title</b></label>
+        <input type="text" name="listing[title]" class="form-control" placeholder="Enter a catchy title" required>
+        <div class="valid-feedback">Title looks Good!</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><b>Description</b></label>
+        <textarea name="listing[description]" class="form-control" required></textarea>
+        <div class="invalid-feedback">Please enter a short description</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><b>Upload Images</b></label>
+        <input type="file" name="listing[images][]" class="form-control mb-1" multiple>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-md-8">
+          <label class="f  orm-label"><b>Price</b></label>
+          <input type="number" name="listing[price]" class="form-control" placeholder="4000" required>
+          <div class="invalid-feedback">Valid price required!</div>
+        </div>
+        <div class="mb-3 col-md-4">
+          <label class="form-label"><b>Discount (%)</b></label>
+          <input type="number" name="listing[discount]" class="form-control" placeholder="0" min="0" max="90" step="1">
+          <div class="form-text">Enter discount percentage (0-90%)</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label"><b>Property type</b></label>
+        <select name="listing[propertyType]" class="form-control" required>
+          <option value="">Select type</option>
+          <option>Apartment</option>
+          <option>Villa</option>
+          <option>Homestay</option>
+          <option>Hostel Bed</option>
+          <option>Haveli</option>
+          <option>Cottage</option>
+          <option>Cabin</option>
+        </select>
+        <div class="invalid-feedback">Valid property type required!</div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-6 col-md-3">
+          <label class="form-label"><b>Guests</b></label>
+          <input type="number" name="listing[guests]" class="form-control" required>
+        </div>
+        <div class="mb-3 col-6 col-md-3">
+          <label class="form-label"><b>Bedrooms</b></label>
+          <input type="number" name="listing[bedrooms]" class="form-control" required>
+        </div>
+        <div class="mb-3 col-6 col-md-3">
+          <label class="form-label"><b>Beds</b></label>
+          <input type="number" name="listing[beds]" class="form-control" required>
+        </div>
+        <div class="mb-3 col-6 col-md-3">
+          <label class="form-label"><b>Bathrooms</b></label>
+          <input type="number" name="listing[bathrooms]" class="form-control" required>
+        </div>
+      </div>
+
+<div class="mb-3">
+  <label class="form-label"><b>Amenities</b></label>
+  <div class="row">
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="WiFi"> WiFi</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="AC"> AC</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Geyser"> Geyser</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Heater"> Heater</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Fireplace"> Fireplace</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Mountain View"> Mountain View</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Pool"> Pool</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Parking"> Parking</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="TV"> TV</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Work Desk"> Work Desk</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Private Beach"> Private Beach</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Balcony"> Balcony</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Fan"> Fan</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Solar Power"> Solar Power</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Courtyard"> Courtyard</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Compost Toilet"> Compost Toilet</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Eco-Friendly"> Eco-Friendly</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Kitchenette"> Kitchenette</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Food"> Food</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Trekking Nearby"> Trekking Nearby</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Local Cuisine"> Local Cuisine</label></div>
+    <div class="col-6 col-lg-4"><label><input type="checkbox" name="listing[amenities][]" value="Forest View"> Forest View</label></div>
+  </div>
+</div>
+
+
+
+      <div class="row">
+        <div class="mb-3 col-md-8">
+          <label class="form-label"><b>Location</b></label>
+          <input type="text" name="listing[location]" class="form-control" placeholder="e.g. Sector 15, Chandigarh" required>
+          <div class="invalid-feedback">Valid location required!</div>
+        </div>
+        <div class="mb-3 col-md-4">
+          <label class="form-label"><b>Country</b></label>
+          <input type="text" name="listing[country]" class="form-control" placeholder="e.g. India" required>
+          <div class="invalid-feedback">Valid country required!</div>
+        </div>
+      </div>
+
+<div class="mb-3">
+  <label class="form-label"><b>Rules</b></label>
+  <div class="row">
+    <div  class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="No smoking"> Smoking is not allowed</label></div>
+    <div  class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="No pets"> Pets sre not allowed</label></div>
+    <div  class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Keep the kitchen clean"> Keep the kitchen clean</label></div>
+    <div  class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="No outside guests"> No outside guests</label></div>
+    <div  class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Use water wisely"> Use water wisely</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Recycle waste"> Recycle waste</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Respect quiet hours"> Respect quiet hours</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Switch off lights & AC when not in use"> Switch off lights & AC when not in use</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Shoes off inside"> Shoes off inside</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Do not rearrange furniture"> Do not rearrange furniture</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Dispose garbage properly"> Dispose garbage properly</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Report damages immediately"> Report damages immediately</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="No parties or events"> No parties or events</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="No cooking non-vegetarian food"> No cooking non-vegetarian food</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Respect local customs"> Respect local customs</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Children must be supervised"> Children must be supervised</label></div>
+    <div class="col-12 col-lg-6"><label><input type="checkbox" name="listing[rules][]" value="Use eco-friendly products where possible"> Use eco-friendly products where possible</label></div>
+  </div>
+</div>
+
+
+
+      <button type="submit" class="btn btn-dark create-btn mt-1">ADD</button>
+      <br><br><br><br><br>
+
+    </form>
+  </div>
+</div>

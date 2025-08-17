@@ -1,0 +1,55 @@
+<!-- Navbar (responsive for both desktop and mobile) -->
+<nav class="navbar navbar-expand-md bg-white shadow-sm sticky-top px-3">
+  <div class="container-fluid">
+    <!-- Logo/Brand -->
+    <a class="navbar-brand fw-bold" href="/listings">
+      <i class="fa-regular fa-compass me-2"></i>BnBharat
+    </a>
+
+    <!-- Toggle button for mobile view only (visible on small screens) -->
+    <button class="btn d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
+      <i class="fa-solid fa-bars fs-4"></i>
+    </button>
+
+    <!-- Navbar links for desktop (visible on medium and larger screens) -->
+    <div class="collapse navbar-collapse justify-content-end">
+      <div class="navbar-nav gap-2">
+        <a class="nav-link" href="/listings/new">Host with BharatBnB</a>
+        <a class="nav-link" href="/listings/liked">&hearts; Favorites</a>
+
+        <% if (!currentUser) { %>
+          <a class="nav-link" href="/register"><b>Register</b></a>
+          <a class="nav-link" href="/login"><b>Login</b></a>
+        <% } else { %>
+          <span class="nav-link disabled text-muted">Welcome, <b><%= currentUser.username %></b></span>
+          <a class="nav-link" href="/logout"><b>Logout</b></a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Offcanvas sidebar for mobile (hidden on desktop) -->
+<div class="offcanvas offcanvas-start custom-offcanvas" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title fw-bold" id="sideMenuLabel">
+      <i class="fa-solid fa-bars me-2"></i> Menu
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-2">
+    <a class="nav-link side-link" href="/listings"><i class="fa-solid fa-map-location-dot me-2"></i>Explore Properties</a><br>
+    <a class="nav-link side-link" href="/listings/new"><i class="fa-solid fa-door-open me-2"></i>Host with BharatBnB</a><br>
+    <a class="nav-link side-link" href="/listings/liked"><i class="fa-solid fa-heart me-2 text-danger"></i>Favorites</a><br>
+
+    <% if (!currentUser) { %>
+      <a class="nav-link side-link" href="/register"><i class="fa-solid fa-user-plus me-2"></i><b>Register</b></a><br>
+      <a class="nav-link side-link" href="/login"><i class="fa-solid fa-sign-in-alt me-2"></i><b>Login</b></a>
+    <% } else { %>
+      <span class="nav-link disabled text-muted">
+        <i class="fa-solid fa-user me-2"></i>Welcome, <b><%= currentUser.username %></b>
+      </span><br>
+      <a class="nav-link side-link" href="/logout"><i class="fa-solid fa-sign-out-alt me-2"></i><b>Logout</b></a>
+    <% } %>
+  </div>
+</div>

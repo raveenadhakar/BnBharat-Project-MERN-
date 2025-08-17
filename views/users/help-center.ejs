@@ -1,0 +1,88 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-5">
+  <div class="col-10 offset-1">
+    <h1 class="mb-4">Help Center</h1>
+    
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Frequently Asked Questions</h5>
+            
+            <div class="accordion" id="faqAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                    How do I book a property?
+                  </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Browse our listings, select your dates, and click "Book Now". You'll need to create an account and provide payment information to complete your booking.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                    What payment methods do you accept?
+                  </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    We accept all major credit cards, debit cards, UPI, net banking, and digital wallets like Paytm and PhonePe.
+                  </div>
+                </div>
+              </div>
+              
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                    How do I contact my host?
+                  </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Once your booking is confirmed, you'll receive the host's contact information. You can also message them through our platform.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Need More Help?</h5>
+            <p class="card-text">Can't find what you're looking for? Our support team is here to help.</p>
+            
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" type="button">
+                <i class="fas fa-phone me-2"></i>Call Support
+              </button>
+              <button class="btn btn-outline-primary" type="button">
+                <i class="fas fa-envelope me-2"></i>Email Us
+              </button>
+              <button class="btn btn-outline-primary" type="button">
+                <i class="fas fa-comments me-2"></i>Live Chat
+              </button>
+            </div>
+            
+            <hr class="my-3">
+            
+            <h6>Contact Information</h6>
+            <p class="small">
+              <strong>Phone:</strong> +91-11-4567-8900<br>
+              <strong>Email:</strong> support@bnbharat.com<br>
+              <strong>Hours:</strong> 24/7 Support
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,165 @@
+<% layout("/layouts/boilerplate") %>
+
+  <div class="row mt-3">
+    <div class="col-8 offset-2">
+      <h3 class="fun-title">
+        <i class="fa-solid fa-house-user"></i>
+        &nbsp;Do changes to your place
+      </h3>
+
+      <form method="POST" action="/listings/<%=listing._id%>?_method=PUT" class="needs-validation" novalidate
+        enctype="multipart/form-data">
+
+        <div class="mb-3">
+          <label class="form-label"><b>Title</b></label>
+          <input type="text" name="listing[title]" class="form-control" value="<%=listing.title%>" required>
+          <div class="invalid-feedback">Title looks Good!</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><b>Description</b></label>
+          <textarea name="listing[description]" class="form-control" required><%=listing.description%></textarea>
+          <div class="invalid-feedback">Please enter a short description</div>
+        </div>
+<div class="mb-3">
+  <label class="form-label"><b>Original Images</b></label>
+  <div class="mb-2 d-flex flex-wrap gap-2">
+    <% (listing.images || []).forEach((img, idx) => { %>
+      <img src="<%= img.url %>" alt="Image <%= idx + 1 %>" style="width: 100px; height: auto; border-radius: 6px;">
+    <% }) %>
+  </div>
+
+  <label class="form-label mt-2"><b>Upload New Images (Max 12)</b></label>
+  <input 
+    type="file" 
+    name="listing[images][]" 
+    class="form-control" 
+    multiple 
+    accept="image/*"
+    onchange="limitFiles(this)"
+  >
+  <div id="fileLimitWarning" style="color: red; font-size: 0.9rem;"></div>
+</div>
+
+
+
+        <div class="row">
+          <div class="mb-3 col-md-8">
+            <label class="form-label"><b>Price</b></label>
+            <input type="number" name="listing[price]" class="form-control" value="<%=listing.price%>" required>
+            <div class="invalid-feedback">Valid price required!</div>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label"><b>Discount (%)</b></label>
+            <input type="number" name="listing[discount]" class="form-control" value="<%=listing.discount%>" min="0" max="90" step="1">
+            <div class="form-text">Enter discount percentage (0-90%)</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><b>Property type</b></label>
+          <select name="listing[propertyType]" class="form-control" required>
+            <option value="">Select type</option>
+            <% const types=["Apartment","Villa","Homestay","Hostel Bed","Haveli","Cottage","Cabin"]; %>
+              <% types.forEach(type=> { %>
+                <option value="<%=type%>" <%=listing.propertyType===type?'selected':''%>><%=type%>
+                </option>
+                <% }) %>
+          </select>
+          <div class="invalid-feedback">Valid property type required!</div>
+        </div>
+
+        <div class="row">
+          <div class="mb-3 col-6 col-md-3">
+            <label class="form-label"><b>Guests</b></label>
+            <input type="number" name="listing[guests]" class="form-control" value="<%=listing.guests%>" required>
+          </div>
+          <div class="mb-3 col-6 col-md-3">
+            <label class="form-label"><b>Bedrooms</b></label>
+            <input type="number" name="listing[bedrooms]" class="form-control" value="<%=listing.bedrooms%>" required>
+          </div>
+          <div class="mb-3 col-6 col-md-3">
+            <label class="form-label"><b>Beds</b></label>
+            <input type="number" name="listing[beds]" class="form-control" value="<%=listing.beds%>" required>
+          </div>
+          <div class="mb-3 col-6 col-md-3">
+            <label class="form-label"><b>Bathrooms</b></label>
+            <input type="number" name="listing[bathrooms]" class="form-control" value="<%=listing.bathrooms%>" required>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><b>Amenities</b></label>
+          <div class="row">
+<% const amenitiesList = [
+  "WiFi","AC","Geyser","Heater","Fireplace","Mountain View","Pool","Parking","TV",
+  "Work Desk","Private Beach","Balcony","Fan","Solar Power","Courtyard","Compost Toilet",
+  "Eco-Friendly","Kitchenette","Food","Trekking Nearby","Local Cuisine","Forest View"
+]; %>
+
+              <% amenitiesList.forEach(am=> { %>
+                <div class="col-6 col-lg-4">
+                  <label>
+                    <input type="checkbox" name="listing[amenities][]" value="<%=am%>" <%=(listing.amenities ||
+                      []).includes(am)?'checked':'' %>> <%=am%>
+                  </label>
+                </div>
+                <% }) %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="mb-3 col-md-8">
+            <label class="form-label"><b>Location</b></label>
+            <input type="text" name="listing[location]" class="form-control" value="<%=listing.location%>" required>
+            <div class="invalid-feedback">Location should be valid</div>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label class="form-label"><b>Country</b></label>
+            <input type="text" name="listing[country]" class="form-control" value="<%=listing.country%>" required>
+            <div class="invalid-feedback">Country name should be valid</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><b>Rules</b></label>
+          <div class="row">
+<% const rulesList = [
+  "No smoking","No pets","Keep the kitchen clean","No outside guests","Use water wisely",
+  "Recycle waste","Respect quiet hours","Switch off lights & AC when not in use","Shoes off inside",
+  "Do not rearrange furniture","Dispose garbage properly","Report damages immediately",
+  "No parties or events","No cooking non-vegetarian food","Respect local customs",
+  "Children must be supervised","Use eco-friendly products where possible"
+]; %>
+
+              <% rulesList.forEach(rule=> { %>
+                <div class="col-12 col-lg-6">
+                  <label>
+                    <input type="checkbox" name="listing[rules][]" value="<%=rule%>" <%=(listing.rules ||
+                      []).includes(rule)?'checked':'' %>> <%=rule%>
+                  </label>
+                </div>
+                <% }) %>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-dark edit-btn mt-3">EDIT</button>
+        <br><br><br><br><br>
+      </form>
+    </div>
+  </div>
+
+  <script>
+function limitFiles(input) {
+  const maxFiles = 12;
+  const warning = document.getElementById('fileLimitWarning');
+  
+  if (input.files.length > maxFiles) {
+    warning.textContent = `You can only upload up to ${maxFiles} images. You selected ${input.files.length}.`;
+    input.value = ""; // Clear selected files
+  } else {
+    warning.textContent = "";
+  }
+}
+
+</script>
