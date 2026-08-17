@@ -1,0 +1,194 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+
+      <!-- Chat Header -->
+      <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-white border rounded shadow-sm">
+        <% if (listing.images && listing.images[0]) { %>
+          <img src="<%= listing.images[0].url %>" class="rounded" width="48" height="48" style="object-fit:cover;">
+        <% } %>
+        <div class="flex-grow-1">
+          <h6 class="mb-0 fw-bold"><%= listing.title %></h6>
+          <small class="text-muted">
+            <% if (otherUser) { %>
+              Chatting with <strong><%= otherUser.username %></strong>
+            <% } else { %>
+              All messages on this listing
+            <% } %>
+          </small>
+        </div>
+        <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-secondary">
+          View Listing
+        </a>
+      </div>
+
+      <!-- Messages Box -->
+      <div id="chatMessages"
+           class="p-3 mb-3 border rounded bg-light"
+           style="height: 440px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+
+        <% messages.forEach(msg => {
+            const isSelf = msg.sender._id.equals(currentUser._id);
+        %>
+          <div class="d-flex <%= isSelf ? 'justify-content-end' : 'align-items-end gap-2' %>">
+            <% if (!isSelf) { %>
+              <div class="avatar-circle flex-shrink-0">
+                <%= msg.sender.username.charAt(0).toUpperCase() %>
+              </div>
+            <% } %>
+            <div class="chat-bubble <%= isSelf ? 'sent' : 'received' %>">
+              <p class="mb-1"><%= msg.message %></p>
+              <small class="opacity-60" style="font-size:0.72rem;">
+                <%= new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) %>
+              </small>
+            </div>
+          </div>
+        <% }) %>
+
+        <div id="chatBottom"></div>
+      </div>
+
+      <!-- Input Row -->
+      <div class="input-group shadow-sm">
+        <input id="msgInput"
+               type="text"
+               class="form-control"
+               placeholder="Type a message…"
+               maxlength="1000"
+               autocomplete="off">
+        <button id="sendBtn" class="btn btn-danger px-4">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  .avatar-circle {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #333; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .chat-bubble {
+    max-width: 68%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+  .chat-bubble.sent {
+    background: #fe424d;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-bubble.received {
+    background: white;
+    border: 1px solid #ddd;
+    border-bottom-left-radius: 4px;
+  }
+</style>
+
+<!-- Socket.io client (served automatically by socket.io) -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket     = io();
+  const room       = "listing_<%= listing._id %>";
+  const myId       = "<%= currentUser._id %>";
+  const myName     = "<%= currentUser.username %>";
+  const receiverId = "<%= receiverId %>";   // host's id (empty if current user IS host)
+
+  socket.emit("joinRoom", room);
+
+  // ── Helpers ─────────────────────────────────────────────────────────
+  function scrollBottom() {
+    const box = document.getElementById("chatMessages");
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function buildBubble({ message, senderName, createdAt, isSelf }) {
+    const time = new Date(createdAt || Date.now())
+      .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    if (isSelf) {
+      return `
+        <div class="d-flex justify-content-end">
+          <div class="chat-bubble sent">
+            <p class="mb-1">${escHtml(message)}</p>
+            <small class="opacity-60" style="font-size:.72rem;">${time}</small>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="d-flex align-items-end gap-2">
+        <div class="avatar-circle">${escHtml(senderName.charAt(0).toUpperCase())}</div>
+        <div class="chat-bubble received">
+          <p class="mb-1">${escHtml(message)}</p>
+          <small class="opacity-60" style="font-size:.72rem;">${time}</small>
+        </div>
+      </div>`;
+  }
+
+  function escHtml(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function appendBubble(html) {
+    const box    = document.getElementById("chatMessages");
+    const bottom = document.getElementById("chatBottom");
+    const tmp    = document.createElement("div");
+    tmp.innerHTML = html;
+    box.insertBefore(tmp.firstElementChild, bottom);
+    scrollBottom();
+  }
+
+  scrollBottom();
+
+  // ── Send ─────────────────────────────────────────────────────────────
+  function sendMessage() {
+    const input = document.getElementById("msgInput");
+    const text  = input.value.trim();
+    if (!text) return;
+
+    socket.emit("sendMessage", {
+      room,
+      listingId:   "<%= listing._id %>",
+      message:     text,
+      senderId:    myId,
+      senderName:  myName,
+      receiverId:  receiverId
+    });
+
+    appendBubble(buildBubble({ message: text, senderName: myName, isSelf: true }));
+    input.value = "";
+  }
+
+  document.getElementById("sendBtn").addEventListener("click", sendMessage);
+  document.getElementById("msgInput").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // ── Receive ───────────────────────────────────────────────────────────
+  socket.on("newMessage", data => {
+    if (data.senderId !== myId) {
+      appendBubble(buildBubble({
+        message:    data.message,
+        senderName: data.senderName,
+        createdAt:  data.createdAt,
+        isSelf:     false
+      }));
+    }
+  });
+</script>

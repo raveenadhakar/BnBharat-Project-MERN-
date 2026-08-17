@@ -76,7 +76,6 @@ images: [
     type: {
       type: String, // 'Point'
       enum: ['Point'],
-      required: true
     },
     coordinates: {
       type: [Number], // [longitude, latitude]

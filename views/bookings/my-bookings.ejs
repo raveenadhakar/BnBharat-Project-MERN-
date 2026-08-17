@@ -1,0 +1,45 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-4">
+    <h3 class="fw-bold mb-4">My Bookings</h3>
+
+    <% if (bookings.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No bookings yet</h5>
+            <a href="/listings" class="btn btn-danger mt-2">Explore Listings</a>
+        </div>
+    <% } else { %>
+        <div class="row g-3">
+            <% bookings.forEach(booking => { %>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <% if (booking.listing.images && booking.listing.images[0]) { %>
+                            <img src="<%= booking.listing.images[0].url %>" class="card-img-top" style="height: 180px; object-fit: cover;">
+                        <% } %>
+                        <div class="card-body">
+                            <h6 class="fw-bold"><%= booking.listing.title %></h6>
+                            <p class="small text-muted mb-1">
+                                <i class="fas fa-calendar me-1"></i>
+                                <%= booking.checkIn.toDateString() %> → <%= booking.checkOut.toDateString() %>
+                            </p>
+                            <p class="small text-muted mb-2">
+                                <i class="fas fa-moon me-1"></i><%= booking.totalNights %> nights &bull;
+                                ₹<%= booking.totalAmount.toLocaleString("en-IN") %>
+                            </p>
+                            <span class="badge bg-<%= booking.status === 'confirmed' ? 'success' : booking.status === 'cancelled' ? 'danger' : 'warning' %>">
+                                <%= booking.status %>
+                            </span>
+                        </div>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-dark me-1">Details</a>
+                            <a href="/chat/<%= booking.listing._id %>" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comments"></i> Chat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>

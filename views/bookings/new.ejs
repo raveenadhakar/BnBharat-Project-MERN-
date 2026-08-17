@@ -1,0 +1,178 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="mb-1 fw-bold">Reserve your stay</h3>
+                <p class="text-muted mb-4"><%= listing.title %></p>
+
+                <!-- Dates & Guests Form -->
+                <div id="bookingForm">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Check-in</label>
+                            <input type="date" id="checkIn" class="form-control" min="<%= new Date().toISOString().split('T')[0] %>" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Check-out</label>
+                            <input type="date" id="checkOut" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Guests</label>
+                        <select id="guestsSelect" class="form-control">
+                            <% for(let i = 1; i <= listing.guests; i++) { %>
+                                <option value="<%= i %>"><%= i %> Guest<%= i > 1 ? 's' : '' %></option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <!-- Price Summary (shown after dates selected) -->
+                    <div id="priceSummary" class="d-none bg-light rounded p-3 mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>₹<span id="pricePerNight"></span> × <span id="nightsCount"></span> nights</span>
+                            <span>₹<span id="subtotal"></span></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total</span>
+                            <span>₹<span id="totalAmount"></span></span>
+                        </div>
+                    </div>
+
+                    <button id="payBtn" class="btn btn-danger w-100 fw-bold py-2" disabled>
+                        Pay Now
+                    </button>
+                </div>
+
+                <!-- Blocked dates notice -->
+                <p class="text-muted small mt-3 text-center">
+                    <i class="fas fa-shield-alt me-1"></i> Secure payment powered by Razorpay
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    const pricePerNight = <%- listing.discount > 0
+        ? Math.round(listing.price - (listing.price * listing.discount / 100))
+        : listing.price %>;
+    const listingId     = "<%= listing._id %>";
+    const razorpayKeyId = "<%= razorpayKeyId %>";
+    const bookedDates   = <%- bookedDates %>;
+
+    const checkInInput  = document.getElementById("checkIn");
+    const checkOutInput = document.getElementById("checkOut");
+    const payBtn        = document.getElementById("payBtn");
+    const summary       = document.getElementById("priceSummary");
+
+    function updateSummary() {
+        const checkIn  = new Date(checkInInput.value);
+        const checkOut = new Date(checkOutInput.value);
+
+        if (!checkInInput.value || !checkOutInput.value || checkOut <= checkIn) {
+            summary.classList.add("d-none");
+            payBtn.disabled = true;
+            return;
+        }
+
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const total  = pricePerNight * nights;
+
+        document.getElementById("pricePerNight").textContent = pricePerNight.toLocaleString("en-IN");
+        document.getElementById("nightsCount").textContent   = nights;
+        document.getElementById("subtotal").textContent      = total.toLocaleString("en-IN");
+        document.getElementById("totalAmount").textContent   = total.toLocaleString("en-IN");
+
+        summary.classList.remove("d-none");
+        payBtn.disabled = false;
+    }
+
+    checkInInput.addEventListener("change", () => {
+        checkOutInput.min = checkInInput.value;
+        updateSummary();
+    });
+    checkOutInput.addEventListener("change", updateSummary);
+
+    payBtn.addEventListener("click", async () => {
+        payBtn.disabled = true;
+        payBtn.textContent = "Processing...";
+
+        try {
+            const res = await fetch("/bookings/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    listingId,
+                    checkIn:  checkInInput.value,
+                    checkOut: checkOutInput.value,
+                    guests:   document.getElementById("guestsSelect").value
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || "Booking failed");
+                payBtn.disabled = false;
+                payBtn.textContent = "Pay Now";
+                return;
+            }
+
+            // Open Razorpay checkout
+            const rzp = new Razorpay({
+                key: razorpayKeyId,
+                amount: data.amount,
+                currency: data.currency,
+                order_id: data.orderId,
+                name: "BnBharat",
+                description: "Property Booking",
+                image: "/images/logo.png",
+                theme: { color: "#fe424d" },
+
+                handler: async function(response) {
+                    // Verify on backend
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = "/bookings/verify";
+
+                    const fields = {
+                        razorpay_order_id:   response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature:  response.razorpay_signature,
+                        bookingId:           data.bookingId
+                    };
+
+                    for (const [key, val] of Object.entries(fields)) {
+                        const input = document.createElement("input");
+                        input.type  = "hidden";
+                        input.name  = key;
+                        input.value = val;
+                        form.appendChild(input);
+                    }
+
+                    document.body.appendChild(form);
+                    form.submit();
+                },
+
+                modal: {
+                    ondismiss: function() {
+                        payBtn.disabled = false;
+                        payBtn.textContent = "Pay Now";
+                    }
+                }
+            });
+
+            rzp.open();
+        } catch (err) {
+            alert("Something went wrong. Please try again.");
+            payBtn.disabled = false;
+            payBtn.textContent = "Pay Now";
+        }
+    });
+</script>

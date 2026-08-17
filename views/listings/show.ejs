@@ -1,3 +1,6 @@
+<link 
+href="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.css" 
+rel="stylesheet">
 <% layout("/layouts/boilerplate") %>
   <div class="row mt-3">
     <div class="col-8 offset-2">
@@ -161,6 +164,23 @@
                   </div>
                   <% } %>
           </div>
+
+          <!-- Book Now + Chat Buttons -->
+          <div class="mt-3 d-flex gap-2 flex-wrap">
+            <% if (currentUser && !currentUser._id.equals(listing.owner._id)) { %>
+              <a href="/bookings/new/<%= listing._id %>" class="btn btn-danger fw-bold px-4">
+                <i class="fas fa-calendar-check me-2"></i>Book Now
+              </a>
+              <a href="/chat/<%= listing._id %>" class="btn btn-outline-dark px-4">
+                <i class="fas fa-comments me-2"></i>Message Host
+              </a>
+            <% } else if (!currentUser) { %>
+              <a href="/login" class="btn btn-danger fw-bold px-4">
+                <i class="fas fa-sign-in-alt me-2"></i>Login to Book
+              </a>
+            <% } %>
+          </div>
+
         </div>
       </div>
       <br>
@@ -466,11 +486,13 @@
       }
     });
   </script>
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js">
-  </script>
+
+
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
   <script>
     let mapToken = "<%= process.env.MAP_TOKEN %>";
-    let listing = <% - JSON.stringify(listing) %>;
+    let listing = <%- JSON.stringify(listing) %>;
     mapboxgl.accessToken = mapToken;
     const map = new mapboxgl.Map({
       container: 'map', // container ID

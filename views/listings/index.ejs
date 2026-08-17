@@ -1,374 +1,127 @@
 <% layout("/layouts/boilerplate") %>
-    <!-- Redesigned Filters Section -->
-    <div class="container-fluid px-4 py-3">
-        <div class="filters-main-container d-flex align-items-center justify-content-between">
-            <!-- Advanced Filters Button (Left Side) -->
-            <div class="advanced-filters-toggle">
-                <button class="btn btn-outline-secondary d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse">
-                    <i class="fas fa-sliders-h me-2"></i>Filters 
-                </button>
-            </div>
-            <!-- Essential Filter Icons (Center) -->
-            <div class="essential-filters d-flex align-items-center justify-content-center flex-grow-1">
-                <div class="filter-icon mx-3" onclick="quickFilter('trending')">
+
+    <!-- Clean Filter Bar -->
+    <div class="container-fluid px-5 py-3 filter-bar-wrapper">
+        <div class="d-flex align-items-center justify-content-between">
+
+            <!-- Essential Filter Icons -->
+            <div class="d-flex align-items-center gap-4 flex-grow-1 justify-content-center">
+                <div class="filter-icon <%= (filters && filters.sortBy === 'newest') ? 'active' : '' %>"
+                    onclick="quickFilter('trending')">
                     <div class="icon-container"><i class="fa-solid fa-fire"></i></div>
                     <p class="filter-label">Trending</p>
                 </div>
-                <div class="filter-icon mx-3" onclick="quickFilter('hostels')">
+                <div class="filter-icon <%= (filters && filters.propertyType === 'Hostel Bed') ? 'active' : '' %>"
+                    onclick="quickFilter('hostels')">
                     <div class="icon-container"><i class="fa-solid fa-bed"></i></div>
                     <p class="filter-label">Hostels</p>
                 </div>
-                <div class="filter-icon mx-3" onclick="quickFilter('apartments')">
+                <div class="filter-icon <%= (filters && filters.propertyType === 'Apartment') ? 'active' : '' %>"
+                    onclick="quickFilter('apartments')">
                     <div class="icon-container"><i class="fa-solid fa-building"></i></div>
                     <p class="filter-label">Apartments</p>
                 </div>
-                <div class="filter-icon mx-3" onclick="quickFilter('villas')">
+                <div class="filter-icon <%= (filters && filters.propertyType === 'Villa') ? 'active' : '' %>"
+                    onclick="quickFilter('villas')">
                     <div class="icon-container"><i class="fa-solid fa-home"></i></div>
                     <p class="filter-label">Villas</p>
                 </div>
-                <div class="filter-icon mx-3" onclick="quickFilter('cabins')">
+                <div class="filter-icon <%= (filters && filters.propertyType === 'Cabin') ? 'active' : '' %>"
+                    onclick="quickFilter('cabins')">
                     <div class="icon-container"><i class="fa-solid fa-tree"></i></div>
                     <p class="filter-label">Cabins</p>
                 </div>
+                <div class="filter-icon <%= (filters && filters.propertyType === 'Homestay') ? 'active' : '' %>"
+                    onclick="quickFilter('homestays')">
+                    <div class="icon-container"><i class="fa-solid fa-house-user"></i></div>
+                    <p class="filter-label">Homestays</p>
+                </div>
+                <div class="filter-icon <%= (filters && filters.hasDiscount) ? 'active' : '' %>"
+                    onclick="quickFilter('discounted')">
+                    <div class="icon-container"><i class="fa-solid fa-tag"></i></div>
+                    <p class="filter-label">Deals</p>
+                </div>
             </div>
 
-            <div class="results-count">
-                <span class="text-muted fw-medium"><%= totalResults || allListings.length %> properties</span>
+            <!-- Results Count -->
+            <div class="results-count ms-4">
+                <span class="text-muted"><%= totalResults || allListings.length %> properties</span>
             </div>
 
         </div>
     </div>
 
-    <div class="container mt-2">
-
-    <!-- Advanced Filters Section -->
-        <div class="filters-container mb-4">
-            <div class="card">
-                <div id="filtersCollapse"
-                    class="collapse <%= (filters && Object.keys(filters).length > 0) ? 'show' : '' %>">
-                    <div class="card-body">
-                        <form id="filterForm" method="GET" action="/listings">
-                            <div class="row g-3">
-                                <!-- Search Bar -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Search</label>
-                                    <input type="text" name="search" class="form-control"
-                                        placeholder="Search listings..."
-                                        value="<%= (filters && filters.search) || '' %>">
-                                </div>
-
-                                <!-- Location -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Location</label>
-                                    <input type="text" name="location" class="form-control" placeholder="City or Area"
-                                        value="<%= (filters && filters.location) || '' %>">
-                                </div>
-
-                                <!-- Sort By -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Sort By</label>
-                                    <select name="sortBy" class="form-control">
-                                        <option value="">Default</option>
-                                        <option value="price_low" <%=(filters && filters.sortBy==='price_low' )
-                                            ? 'selected' : '' %>>Price: Low to High</option>
-                                        <option value="price_high" <%=(filters && filters.sortBy==='price_high' )
-                                            ? 'selected' : '' %>>Price: High to Low</option>
-                                        <option value="newest" <%=(filters && filters.sortBy==='newest' ) ? 'selected'
-                                            : '' %>>Newest First</option>
-                                        <option value="oldest" <%=(filters && filters.sortBy==='oldest' ) ? 'selected'
-                                            : '' %>>Oldest First</option>
-                                        <option value="title" <%=(filters && filters.sortBy==='title' ) ? 'selected'
-                                            : '' %>>Name A-Z</option>
-                                    </select>
-                                </div>
-
-                                <!-- Price Range -->
-                                <div class="col-md-3">
-                                    <label class="form-label">Price Range (₹)</label>
-                                    <div class="d-flex gap-2">
-                                        <input type="number" name="minPrice" placeholder="Min" class="form-control"
-                                            value="<%= (filters && filters.minPrice) || '' %>">
-                                        <input type="number" name="maxPrice" placeholder="Max" class="form-control"
-                                            value="<%= (filters && filters.maxPrice) || '' %>">
-                                    </div>
-                                </div>
-
-                                <!-- Property Type -->
-                                <div class="col-md-3">
-                                    <label class="form-label">Property Type</label>
-                                    <select name="propertyType" class="form-control">
-                                        <option value="">All Types</option>
-                                        <option value="Villa" <%=(filters && filters.propertyType==='Villa' )
-                                            ? 'selected' : '' %>>Villa</option>
-                                        <option value="Apartment" <%=(filters && filters.propertyType==='Apartment' )
-                                            ? 'selected' : '' %>>Apartment</option>
-                                        <option value="Homestay" <%=(filters && filters.propertyType==='Homestay' )
-                                            ? 'selected' : '' %>>Homestay</option>
-                                        <option value="Hostel Bed" <%=(filters && filters.propertyType==='Hostel Bed' )
-                                            ? 'selected' : '' %>>Hostel Bed</option>
-                                        <option value="Haveli" <%=(filters && filters.propertyType==='Haveli' )
-                                            ? 'selected' : '' %>>Haveli</option>
-                                        <option value="Cottage" <%=(filters && filters.propertyType==='Cottage' )
-                                            ? 'selected' : '' %>>Cottage</option>
-                                        <option value="Cabin" <%=(filters && filters.propertyType==='Cabin' )
-                                            ? 'selected' : '' %>>Cabin</option>
-                                    </select>
-                                </div>
-
-                                <!-- Guests -->
-                                <div class="col-md-3">
-                                    <label class="form-label">Minimum Guests</label>
-                                    <select name="guests" class="form-control">
-                                        <option value="">Any</option>
-                                        <option value="1" <%=(filters && filters.guests==='1' ) ? 'selected' : '' %>>1+
-                                            Guest</option>
-                                        <option value="2" <%=(filters && filters.guests==='2' ) ? 'selected' : '' %>>2+
-                                            Guests</option>
-                                        <option value="4" <%=(filters && filters.guests==='4' ) ? 'selected' : '' %>>4+
-                                            Guests</option>
-                                        <option value="6" <%=(filters && filters.guests==='6' ) ? 'selected' : '' %>>6+
-                                            Guests</option>
-                                        <option value="8" <%=(filters && filters.guests==='8' ) ? 'selected' : '' %>>8+
-                                            Guests</option>
-                                    </select>
-                                </div>
-
-                                <!-- Discount Filter -->
-                                <div class="col-md-3">
-                                    <label class="form-label">Special Offers</label>
-                                    <div class="form-check mt-2">
-                                        <input type="checkbox" name="hasDiscount" class="form-check-input" <%=(filters
-                                            && filters.hasDiscount) ? 'checked' : '' %>>
-                                        <label class="form-check-label">Show only discounted properties</label>
-                                    </div>
-                                </div>
-
-                                <!-- Amenities -->
-                                <div class="col-12">
-                                    <label class="form-label">Amenities</label>
-                                    <div class="row">
-                                        <% const popularAmenities=['WiFi', 'AC' , 'Pool' , 'Parking' , 'TV'
-                                            , 'Kitchenette' , 'Balcony' , 'Mountain View' ]; %>
-                                            <% popularAmenities.forEach(amenity=> { %>
-                                                <div class="col-6 col-md-3 col-lg-2">
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="amenities" value="<%= amenity %>"
-                                                            class="form-check-input" <%=(filters && filters.amenities &&
-                                                            (Array.isArray(filters.amenities) ?
-                                                            filters.amenities.includes(amenity) :
-                                                            filters.amenities===amenity)) ? 'checked' : '' %>>
-                                                        <label class="form-check-label">
-                                                            <%= amenity %>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <% }) %>
-                                    </div>
-                                </div>
-
-                                <!-- Filter Buttons -->
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary me-2">
-                                        <i class="fas fa-search me-1"></i>Apply Filters
-                                    </button>
-                                    <button type="button" id="clearFilters" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i>Clear All
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Section -->
-        <% if (allListings && allListings.length> 0) { %>
+    <!-- Listings Grid -->
+    <div class="container mt-3">
+        <% if (allListings && allListings.length > 0) { %>
             <div class="row row-cols-lg-4 row-cols-md-3 row-cols-sm-2 row-cols-1 g-4">
-                <% for(let listing of allListings) {%>
+                <% for(let listing of allListings) { %>
                     <div class="col">
                         <a href="/listings/<%= listing._id %>" class="listing-link">
                             <div class="card">
-                                <img src="<%= listing.images[0].url%>" class="card-img-top" alt="listing_image"
+                                <img src="<%= listing.images[0].url %>" class="card-img-top" alt="listing_image"
                                     style="height: 250px; object-fit: cover; border-radius: 0.5rem;">
                                 <div class="card-img-overlay d-flex justify-content-end align-items-start p-2">
-                                    <div class="favorite-icon 
-                                <%= userLiked.includes(listing._id.toString()) ? 'active' : '' %>
-                                " data-id="<%= listing._id %>">
-                                        ♥
-                                    </div>
-
-
+                                    <div class="favorite-icon <%= userLiked.includes(listing._id.toString()) ? 'active' : '' %>"
+                                        data-id="<%= listing._id %>">♥</div>
                                 </div>
-
                                 <div class="card-body">
                                     <p class="card-text">
-                                        <b>
-                                            <%= listing.title%>
-                                        </b><br>
-                                        <% if (listing.discount && listing.discount> 0) { %>
-                                            <% const discountedPrice=listing.price - (listing.price * listing.discount /
-                                                100); %>
-                                                <span class="text-decoration-line-through text-muted">&#8377;<%=
-                                                        listing.price.toLocaleString("en-IN") %></span>
-                                                <span class="fw-bold text-success">&#8377;<%=
-                                                        Math.round(discountedPrice).toLocaleString("en-IN") %>
-                                                </span>/night
-                                                <span class="badge bg-danger ms-1">
-                                                    <%= listing.discount %>% OFF
-                                                </span>
-                                                <% } else { %>
-                                                    &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
-                                                        <% } %>
+                                        <b><%= listing.title %></b><br>
+                                        <% if (listing.discount && listing.discount > 0) { %>
+                                            <% const discountedPrice = listing.price - (listing.price * listing.discount / 100); %>
+                                            <span class="text-decoration-line-through text-muted">&#8377;<%= listing.price.toLocaleString("en-IN") %></span>
+                                            <span class="fw-bold text-success">&#8377;<%= Math.round(discountedPrice).toLocaleString("en-IN") %></span>/night
+                                            <span class="badge bg-danger ms-1"><%= listing.discount %>% OFF</span>
+                                        <% } else { %>
+                                            &#8377;<%= listing.price.toLocaleString("en-IN") %>/night
+                                        <% } %>
                                     </p>
                                 </div>
                             </div>
                         </a>
                     </div>
-                    <% } %>
-            </div>
-            <% } else { %>
-                <!-- No Results Found -->
-                <div class="no-results">
-                    <i class="fas fa-search"></i>
-                    <h4>No properties found</h4>
-                    <p>Try adjusting your filters or search criteria to find more properties.</p>
-                    <button type="button" id="clearFiltersNoResults" class="btn btn-primary">
-                        <i class="fas fa-times me-1"></i>Clear All Filters
-                    </button>
-                </div>
                 <% } %>
+            </div>
+        <% } else { %>
+            <div class="no-results text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No properties found</h4>
+                <p class="text-muted">Try a different category.</p>
+                <a href="/listings" class="btn btn-dark mt-2">View All Listings</a>
+            </div>
+        <% } %>
     </div>
 
     <script>
+        // Like/Favorite functionality
         document.addEventListener('DOMContentLoaded', () => {
-            // Heart/Like functionality
-            const hearts = document.querySelectorAll('.favorite-icon');
-
-            hearts.forEach(heart => {
+            document.querySelectorAll('.favorite-icon').forEach(heart => {
                 heart.addEventListener('click', async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-
                     const listingId = heart.dataset.id;
-
                     const res = await fetch(`/listings/${listingId}/like`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     });
-
                     const data = await res.json();
-                    if (data.liked) {
-                        heart.classList.add("active");
-                    } else {
-                        heart.classList.remove("active");
-                    }
+                    heart.classList.toggle('active', data.liked);
                 });
             });
-
-            // Filter functionality
-            const filterForm = document.getElementById('filterForm');
-            const clearFiltersBtn = document.getElementById('clearFilters');
-
-            // Clear filters functionality
-            clearFiltersBtn.addEventListener('click', function () {
-                // Clear all form inputs
-                filterForm.reset();
-                // Redirect to clean listings page
-                window.location.href = '/listings';
-            });
-
-            // Clear filters from no results section
-            const clearFiltersNoResultsBtn = document.getElementById('clearFiltersNoResults');
-            if (clearFiltersNoResultsBtn) {
-                clearFiltersNoResultsBtn.addEventListener('click', function () {
-                    window.location.href = '/listings';
-                });
-            }
-
-            // Auto-submit on sort change for better UX
-            const sortSelect = document.querySelector('select[name="sortBy"]');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', function () {
-                    filterForm.submit();
-                });
-            }
-
-            // Show active filters count
-            function updateActiveFiltersCount() {
-                const formData = new FormData(filterForm);
-                let activeCount = 0;
-
-                for (let [key, value] of formData.entries()) {
-                    if (value.trim() !== '' && key !== 'sortBy') {
-                        activeCount++;
-                    }
-                }
-
-                const filterButton = document.querySelector('[data-bs-target="#filtersCollapse"]');
-                if (activeCount > 0) {
-                    filterButton.innerHTML = `<i class="fas fa-filter me-2"></i>Advanced Filters & Search (${activeCount} active)`;
-                } else {
-                    filterButton.innerHTML = '<i class="fas fa-filter me-2"></i>Advanced Filters & Search';
-                }
-            }
-
-            // Update count on page load
-            updateActiveFiltersCount();
-
-            // Real-time search (optional - debounced)
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                let searchTimeout;
-                searchInput.addEventListener('input', function () {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        // Auto-submit after 1 second of no typing
-                        // filterForm.submit();
-                    }, 1000);
-                });
-            }
         });
-    </script>
-    <script>
-// Quick filter function for essential category icons
-function quickFilter(category) {
-    const baseUrl = '/listings?';
-    let filterUrl = '';
-    
-    // Remove active class from all filter icons
-    document.querySelectorAll('.filter-icon').forEach(icon => {
-        icon.classList.remove('active');
-    });
-    
-    // Add active class to clicked filter
-    if (event && event.target) {
-        const clickedIcon = event.target.closest('.filter-icon');
-        if (clickedIcon) {
-            clickedIcon.classList.add('active');
+
+        // Quick filter by category
+        function quickFilter(category) {
+            const urls = {
+                'trending':   '/listings?sortBy=newest',
+                'hostels':    '/listings?propertyType=Hostel Bed',
+                'apartments': '/listings?propertyType=Apartment',
+                'villas':     '/listings?propertyType=Villa',
+                'cabins':     '/listings?propertyType=Cabin',
+                'homestays':  '/listings?propertyType=Homestay',
+                'discounted': '/listings?hasDiscount=on&sortBy=price_low'
+            };
+            window.location.href = urls[category] || '/listings';
         }
-    }
-    
-    switch(category) {
-        case 'trending':
-            filterUrl = baseUrl + 'sortBy=newest&hasDiscount=on';
-            break;
-        case 'hostels':
-            filterUrl = baseUrl + 'propertyType=Hostel Bed';
-            break;
-        case 'apartments':
-            filterUrl = baseUrl + 'propertyType=Apartment';
-            break;
-        case 'villas':
-            filterUrl = baseUrl + 'propertyType=Villa';
-            break;
-        case 'cabins':
-            filterUrl = baseUrl + 'propertyType=Cabin';
-            break;
-        default:
-            filterUrl = '/listings';
-    }
-    
-    window.location.href = filterUrl;
-}
-</script>
+    </script>

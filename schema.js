@@ -15,7 +15,7 @@ module.exports.listingSchema = Joi.object({
         bedrooms : Joi.number().required().min(1),
         rules: Joi.array().items(Joi.string()).required(),
         amenities: Joi.array().items(Joi.string()).required(),
-        images: Joi.array().items(Joi.string().allow("", null)).max(5)
+        images: Joi.array().items(Joi.string().allow("", null)).max(12)
     }).required(),
 });
 

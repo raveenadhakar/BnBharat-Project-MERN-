@@ -64,5 +64,29 @@
     src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js">
     </script>
     <script src="/js/script.js"></script>
+
+    <!-- Unread messages badge (only when logged in) -->
+    <% if (locals.currentUser) { %>
+    <script>
+      async function fetchUnreadCount() {
+        try {
+          const res  = await fetch("/chat/unread-count");
+          const data = await res.json();
+          const badge = document.getElementById("unreadBadge");
+          if (badge) {
+            if (data.count > 0) {
+              badge.textContent = data.count;
+              badge.classList.remove("d-none");
+            } else {
+              badge.classList.add("d-none");
+            }
+          }
+        } catch (e) {}
+      }
+      fetchUnreadCount();
+      // Refresh every 30 seconds
+      setInterval(fetchUnreadCount, 30000);
+    </script>
+    <% } %>
 </body>
 </html>

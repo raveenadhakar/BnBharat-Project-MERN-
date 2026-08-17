@@ -1,0 +1,73 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <% if (booking.status === 'confirmed') { %>
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-2"></i>
+                        <h3 class="fw-bold text-success">Booking Confirmed!</h3>
+                    </div>
+                <% } else if (booking.status === 'cancelled') { %>
+                    <div class="text-center mb-4">
+                        <i class="fas fa-times-circle fa-3x text-danger mb-2"></i>
+                        <h3 class="fw-bold text-danger">Booking Cancelled</h3>
+                    </div>
+                <% } %>
+
+                <h5 class="fw-bold mb-3"><%= booking.listing.title %></h5>
+
+                <div class="row mb-2">
+                    <div class="col-6">
+                        <small class="text-muted">Check-in</small>
+                        <p class="fw-semibold mb-0"><%= booking.checkIn.toDateString() %></p>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Check-out</small>
+                        <p class="fw-semibold mb-0"><%= booking.checkOut.toDateString() %></p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted">Guests</small>
+                        <p class="fw-semibold mb-0"><%= booking.guests %></p>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Total Nights</small>
+                        <p class="fw-semibold mb-0"><%= booking.totalNights %></p>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>₹<%= booking.pricePerNight.toLocaleString("en-IN") %> × <%= booking.totalNights %> nights</span>
+                        <span>₹<%= booking.totalAmount.toLocaleString("en-IN") %></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <small class="text-muted">Booking ID: <code><%= booking._id %></code></small><br>
+                    <small class="text-muted">Payment: 
+                        <span class="badge bg-<%= booking.paymentStatus === 'paid' ? 'success' : 'warning' %>">
+                            <%= booking.paymentStatus %>
+                        </span>
+                    </small>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-dark">View Listing</a>
+                    <a href="/chat/<%= booking.listing._id %>" class="btn btn-outline-primary">
+                        <i class="fas fa-comments me-1"></i>Message Host
+                    </a>
+                    <% if (booking.status === 'confirmed') { %>
+                        <form method="POST" action="/bookings/<%= booking._id %>/cancel">
+                            <button class="btn btn-outline-danger" onclick="return confirm('Cancel this booking?')">Cancel</button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
